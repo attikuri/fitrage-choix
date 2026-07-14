@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
+
+/* ── Light theme (default) ───────────────────────── */
+:root {
+  --color-bg:           #F5F0E8;
+  --color-surface:      #FDFAF5;
+  --color-surface-2:    #F0EAE0;
+  --color-border:       #DDD5C8;
+  --color-text:         #2C1810;
+  --color-text-sec:     #6B5744;
+  --color-text-muted:   #A08070;
+  --color-accent:       #8B5E3C;
+  --color-accent-soft:  #F0E6D8;
+  --color-accent-hover: #7A4F2E;
+
+  /* Semantic probability colours */
+  --color-green:        #4A7C59;
+  --color-green-bg:     #EAF3ED;
+  --color-amber:        #C17F24;
+  --color-amber-bg:     #FDF3E0;
+  --color-orange:       #C4622D;
+  --color-orange-bg:    #FCEEE6;
+  --color-red:          #9B3A2A;
+  --color-red-bg:       #F9EAE7;
+  --color-muted-bg:     #EDE8E2;
+}
+
+/* ── Dark theme ──────────────────────────────────── */
+[data-theme="dark"] {
+  --color-bg:           #1A1410;
+  --color-surface:      #251E18;
+  --color-surface-2:    #2F2620;
+  --color-border:       #3D322A;
+  --color-text:         #F0E8DC;
+  --color-text-sec:     #C4A882;
+  --color-text-muted:   #8A7060;
+  --color-accent:       #C4885A;
+  --color-accent-soft:  #2F2218;
+  --color-accent-hover: #D4986A;
+
+  --color-green:        #6BAF82;
+  --color-green-bg:     #1A2E22;
+  --color-amber:        #E0A84B;
+  --color-amber-bg:     #2A2010;
+  --color-orange:       #E07848;
+  --color-orange-bg:    #2A1A10;
+  --color-red:          #C4584A;
+  --color-red-bg:       #2A1210;
+  --color-muted-bg:     #2A2218;
+}
+
+/* ── Fonts ───────────────────────────────────────── */
+*, *::before, *::after,
+input, select, option, button, textarea {
+  font-family: 'IBM Plex Serif', Georgia, serif !important;
+  box-sizing: border-box;
+}
+
+/* Dropdowns & minor/secondary UI text → Sans (Latin only, RTL rule below wins for Arabic) */
+select, option,
+[style*="var(--color-text-muted)"],
+[style*="var(--color-text-sec)"] {
+  font-family: 'IBM Plex Sans', sans-serif !important;
+}
+
+[dir="rtl"],
+[dir="rtl"] *, [dir="rtl"] *::before, [dir="rtl"] *::after,
+[dir="rtl"] input, [dir="rtl"] select, [dir="rtl"] option,
+[dir="rtl"] button, [dir="rtl"] textarea {
+  font-family: 'IBM Plex Sans Arabic', sans-serif !important;
+}
+
+/* ── Scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
