@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["filtrage-choix.onrender.com", "127.0.0.1"]
 CORS_ALLOWED_ORIGINS = [
-    "https://filtrage-choix.vercel.app/",
+    "https://filtrage-choix.vercel.app",
 ]
 
 
