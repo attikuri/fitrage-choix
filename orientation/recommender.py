@@ -240,6 +240,7 @@ def get_recommendations(
         )
         .select_related('etablissement', 'filiere', 'filiere__domaine_code')
         .exclude(filiere__nom__icontains='A DISTANCE')
+        .exclude(filiere__code_fil__regex=r'^.{3}(EPN|EAN)')
         .values(
             'etablissement__code_etb',
             'etablissement__nom',
@@ -474,6 +475,7 @@ def build_wish_card(
             .select_related('etablissement', 'filiere')
             .order_by('-min1')
             .exclude(filiere__nom__icontains='A DISTANCE')
+            .exclude(filiere__code_fil__regex=r'^.{3}(EPN|EAN)')
         )
         seen_fils = set()
         for row in fallback_qs:
