@@ -17,6 +17,7 @@ Entry point:
 """
 from __future__ import annotations
 from dataclasses import dataclass, field
+from operator import add
 from typing import Optional
 from django.db.models import Avg, Min, Max, Count, Q
 from orientation.models import (
@@ -374,6 +375,7 @@ def get_recommendations(
     results.sort(key=lambda r: (
         TIER_ORDER[r.tier],
         -r.prob_pct,                             # highest probability first within tier
+        0 if r.wilaya_etb == wilaya else 1,      # ← prefer student's wilaya
         ETB_RANK.get(r.type_etablissement, 9),   # institution quality as tiebreaker only
     ))
 
@@ -420,6 +422,17 @@ def build_wish_card(
                 card.pop(i)
                 return True
         return False
+
+# ── Medical/health priority: always include if selected ────
+    MEDICAL_PREFIXES = ('P', 'W', 'X')
+    medical_results = [
+        r for r in recommendations
+        if r.domaine_code and r.domaine_code[0] in MEDICAL_PREFIXES
+    ]
+    medical_added = 0
+    for r in medical_results[:2]:   # up to 2 medical slots guaranteed
+        if add(r):
+            medical_added += 1
 
     # ── Slots 1-8: best mix from selected domains ──────────
     targets = [('ambitieux', 2), ('optimal', 3), ('sur', 2), ('garanti', 1)]
