@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { DOMAIN_LABELS, DISCLAIMER, TOOL_DISCLAIMER } from '../i18n'
+import { getFiliereLabel } from '../i18n/filiereLabels'
+import { translateEtablissement } from '../i18n/establishmentLabels'
 import BottomSheet from '../components/BottomSheet'
 
 // ── Colour helpers (unchanged) ─────────────────────
@@ -49,7 +51,7 @@ function ProbBar({ pct }) {
   )
 }
 
-function ResultCard({ r, isSelected, onClick, tr }) {
+function ResultCard({ r, isSelected, onClick, tr, lang }) {
   return (
     <button onClick={onClick} style={{
       width: '100%', textAlign: 'start', padding: '14px 16px', borderRadius: '12px',
@@ -61,10 +63,10 @@ function ResultCard({ r, isSelected, onClick, tr }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '10px' }}>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-            {r.filiere}
+            {getFiliereLabel(lang, r.code_fil, r.filiere)}
           </p>
           <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {r.etablissement}
+            {translateEtablissement(lang, r.etablissement)}
           </p>
         </div>
         <TierBadge tier={r.tier} tr={tr} />
@@ -80,6 +82,12 @@ function DetailContent({ r, tr, lang, onClose }) {
   const pairs = r.years.map((y, i) => ({ year: y, cutoff: r.cutoffs[i] }))
   return (
     <div>
+      {/* Title (filiere / etablissement) */}
+      <div style={{ marginBottom: '16px' }}>
+        <p style={{ fontSize: '15px', fontWeight: 600, marginBottom: '4px' }}>{getFiliereLabel(lang, r.code_fil, r.filiere)}</p>
+        <p style={{ fontSize: '13px', color: 'var(--color-text-sec)' }}>{translateEtablissement(lang, r.etablissement)}</p>
+      </div>
+
       {/* Big probability */}
       <div style={{ textAlign: 'center', padding: '20px', backgroundColor: c.bg, borderRadius: '14px', marginBottom: '20px' }}>
         <p style={{ fontSize: '56px', fontWeight: 400, lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: c.text }}>
@@ -132,9 +140,9 @@ function DetailContent({ r, tr, lang, onClose }) {
   )
 }
 
-function WishCardContent({ card, tr }) {
+function WishCardContent({ card, tr, lang }) {
   const [copied, setCopied] = useState(false)
-  const text = card.map((r, i) => `${i + 1}. ${r.etablissement} — ${r.filiere}`).join('\n')
+  const text = card.map((r, i) => `${i + 1}. ${translateEtablissement(lang, r.etablissement)} — ${getFiliereLabel(lang, r.code_fil, r.filiere)}`).join('\n')
   const copy = () => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000) }
 
   return (
@@ -151,8 +159,8 @@ function WishCardContent({ card, tr }) {
             <div key={`${r.code_etb}-${r.code_fil}-${i}`} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '12px 0', borderBottom: i < card.length - 1 ? '1px solid var(--color-border)' : 'none' }}>
               <span style={{ fontSize: '13px', fontVariantNumeric: 'tabular-nums', color: 'var(--color-text-muted)', width: '20px', flexShrink: 0, paddingTop: '1px' }}>{i + 1}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{r.filiere}</p>
-                <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.etablissement}</p>
+                <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{getFiliereLabel(lang, r.code_fil, r.filiere)}</p>
+                <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{translateEtablissement(lang, r.etablissement)}</p>
               </div>
               <div style={{ textAlign: 'end', flexShrink: 0 }}>
                 <p style={{ fontSize: '13px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: c.text }}>{r.prob_pct}%</p>
@@ -261,7 +269,7 @@ export default function ResultsScreen({ lang, tr, results, profile, isMobile, on
             {all_results.map(r => (
               <ResultCard
                 key={`${r.code_etb}-${r.code_fil}-${r.wilaya_cible}`}
-                r={r} tr={tr}
+                r={r} tr={tr} lang={lang}
                 isSelected={selected?.code_fil === r.code_fil && selected?.code_etb === r.code_etb}
                 onClick={() => handleCardClick(r)}
               />
@@ -308,7 +316,7 @@ export default function ResultsScreen({ lang, tr, results, profile, isMobile, on
           <BottomSheet
             open={detailOpen}
             onClose={() => setDetailOpen(false)}
-            title={selected?.filiere || ''}
+            title={selected ? getFiliereLabel(lang, selected.code_fil, selected.filiere) : ''}
           >
             <DetailContent r={selected} tr={tr} lang={lang} />
           </BottomSheet>
@@ -319,7 +327,7 @@ export default function ResultsScreen({ lang, tr, results, profile, isMobile, on
             onClose={() => setWishOpen(false)}
             title={tr('wishCard')}
           >
-            <WishCardContent card={wish_card} tr={tr} />
+            <WishCardContent card={wish_card} tr={tr} lang={lang} />
           </BottomSheet>
         </>
       ) : (
@@ -332,7 +340,7 @@ export default function ResultsScreen({ lang, tr, results, profile, isMobile, on
                 {all_results.map(r => (
                   <ResultCard
                     key={`${r.code_etb}-${r.code_fil}-${r.wilaya_cible}`}
-                    r={r} tr={tr}
+                    r={r} tr={tr} lang={lang}
                     isSelected={selected?.code_fil === r.code_fil && selected?.code_etb === r.code_etb}
                     onClick={() => handleCardClick(r)}
                   />
@@ -358,7 +366,7 @@ export default function ResultsScreen({ lang, tr, results, profile, isMobile, on
                   </div>
                 </div>
                 <div style={{ padding: '4px 16px 8px' }}>
-                  <WishCardContent card={wish_card} tr={tr} />
+                  <WishCardContent card={wish_card} tr={tr} lang={lang} />
                 </div>
               </div>
             </div>
